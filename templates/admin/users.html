@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Users - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <h3>Admin Panel</h3>
+        <nav>
+            <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-dashboard"></i> Dashboard</a>
+            <a href="{{ url_for('admin.products') }}"><i class="fas fa-box"></i> Products</a>
+            <a href="{{ url_for('admin.categories') }}"><i class="fas fa-tags"></i> Categories</a>
+            <a href="{{ url_for('admin.orders') }}"><i class="fas fa-shopping-bag"></i> Orders</a>
+            <a href="{{ url_for('admin.users') }}" class="active"><i class="fas fa-users"></i> Users</a>
+        </nav>
+    </aside>
+
+    <div class="admin-content">
+        <h1 style="margin-bottom: 2rem;">Manage Users</h1>
+
+        <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: var(--shadow);">
+            <table class="admin-table" style="width: 100%;">
+                <thead>
+                    <tr style="background: #f9fafb;">
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Joined</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+                        <td><strong>{{ user.username }}</strong></td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.get_full_name() or 'N/A' }}</td>
+                        <td>
+                            {% if user.is_admin %}
+                                <span style="background: #dbeafe; color: #1e40af; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 600;">Admin</span>
+                            {% else %}
+                                <span style="background: #f3f4f6; color: #374151; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;">Customer</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ user.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
