@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block title %}Categories - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <h3>Admin Panel</h3>
+        <nav>
+            <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-dashboard"></i> Dashboard</a>
+            <a href="{{ url_for('admin.products') }}"><i class="fas fa-box"></i> Products</a>
+            <a href="{{ url_for('admin.categories') }}" class="active"><i class="fas fa-tags"></i> Categories</a>
+            <a href="{{ url_for('admin.orders') }}"><i class="fas fa-shopping-bag"></i> Orders</a>
+            <a href="{{ url_for('admin.users') }}"><i class="fas fa-users"></i> Users</a>
+        </nav>
+    </aside>
+
+    <div class="admin-content">
+        <h1 style="margin-bottom: 2rem;">Manage Categories</h1>
+
+        <div style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: var(--shadow); margin-bottom: 2rem; max-width: 600px;">
+            <h3>Add New Category</h3>
+            <form method="post" style="margin-top: 1rem;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div style="margin-bottom: 1rem;">
+                    <label>Name *</label>
+                    <input type="text" name="name" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label>Slug *</label>
+                    <input type="text" name="slug" required placeholder="fresh-fruits" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <label>Description</label>
+                    <textarea name="description" rows="3" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Add Category</button>
+            </form>
+        </div>
+
+        <div style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: var(--shadow);">
+            <h3>Existing Categories</h3>
+            {% if categories %}
+            <table class="admin-table" style="width: 100%; margin-top: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Description</th>
+                        <th>Products</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr>
+                        <td><strong>{{ cat.name }}</strong></td>
+                        <td>{{ cat.slug }}</td>
+                        <td>{{ cat.description or 'N/A' }}</td>
+                        <td>{{ cat.products|length }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: #6b7280; margin-top: 1rem;">No categories found. Add one above!</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
