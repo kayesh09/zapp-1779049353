@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Add Product - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <h3>Admin Panel</h3>
+        <nav>
+            <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-dashboard"></i> Dashboard</a>
+            <a href="{{ url_for('admin.products') }}" class="active"><i class="fas fa-box"></i> Products</a>
+            <a href="{{ url_for('admin.categories') }}"><i class="fas fa-tags"></i> Categories</a>
+            <a href="{{ url_for('admin.orders') }}"><i class="fas fa-shopping-bag"></i> Orders</a>
+            <a href="{{ url_for('admin.users') }}"><i class="fas fa-users"></i> Users</a>
+        </nav>
+    </aside>
+
+    <div class="admin-content">
+        <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Add New Product</h1>
+            <a href="{{ url_for('admin.products') }}" class="btn btn-outline">Back to Products</a>
+        </div>
+
+        <div style="background: white; padding: 2rem; border-radius: 1rem; box-shadow: var(--shadow); max-width: 800px;">
+            <form method="post" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label>Product Name *</label>
+                        <input type="text" name="name" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                    </div>
+                    <div class="form-group">
+                        <label>Slug *</label>
+                        <input type="text" name="slug" required placeholder="organic-bananas" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Description</label>
+                    <textarea name="description" rows="4" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;"></textarea>
+                </div>
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label>Price *</label>
+                        <input type="number" name="price" step="0.01" min="0" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                    </div>
+                    <div class="form-group">
+                        <label>Discount Price</label>
+                        <input type="number" name="discount_price" step="0.01" min="0" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label>Stock Quantity *</label>
+                        <input type="number" name="stock" min="0" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                    </div>
+                    <div class="form-group">
+                        <label>Unit</label>
+                        <input type="text" name="unit" value="piece" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div class="form-group">
+                        <label>SKU</label>
+                        <input type="text" name="sku" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                    </div>
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select name="category_id" required style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 0.5rem;">
+                            <option value="">Select Category</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.id }}">{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Product Image</label>
+                    <input type="file" name="image" accept="image/*" style="display: block; margin-top: 0.5rem;">
+                    <small style="color: #6b7280;">Recommended: 800x800px, Max 16MB</small>
+                </div>
+
+                <div style="display: flex; gap: 2rem; margin-bottom: 1.5rem;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" name="is_active" checked> Active
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.5rem;">
+                        <input type="checkbox" name="is_featured"> Featured
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem;">
+                    <button type="submit" class="btn btn-primary">Add Product</button>
+                    <a href="{{ url_for('admin.products') }}" class="btn btn-outline">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
