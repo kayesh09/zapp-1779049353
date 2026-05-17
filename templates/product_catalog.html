@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Products - FreshMart{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Our Products</h1>
+        <div class="breadcrumb">
+            <a href="{{ url_for('pages.index') }}">Home</a> / <span>Shop</span>
+        </div>
+    </div>
+</div>
+
+<section class="catalog-section">
+    <div class="container">
+        <div class="catalog-layout">
+            <aside class="filters-sidebar">
+                <div class="filter-block">
+                    <h3>Categories</h3>
+                    <ul class="filter-list">
+                        <li><a href="{{ url_for('products.catalog') }}" class="{% if not category_slug %}active{% endif %}">All Products</a></li>
+                        {% for cat in categories %}
+                        <li>
+                            <a href="{{ url_for('products.catalog', category=cat.slug) }}"
+                               class="{% if category_slug == cat.slug %}active{% endif %}">
+                                {{ cat.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </aside>
+
+            <div class="catalog-content">
+                <div class="catalog-toolbar">
+                    <p>Showing {{ products.items|length }} of {{ products.total }} products</p>
+                    <select name="sort" class="sort-select" onchange="window.location.href=this.value">
+                        <option value="{{ url_for('products.catalog', category=category_slug or None, q=search_query or None) }}" {% if sort == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="{{ url_for('products.catalog', category=category_slug or None, q=search_query or None, sort='price_low') }}" {% if sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="{{ url_for('products.catalog', category=category_slug or None, q=search_query or None, sort='price_high') }}" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="{{ url_for('products.catalog', category=category_slug or None, q=search_query or None, sort='name') }}" {% if sort == 'name' %}selected{% endif %}>Name</option>
+                    </select>
+                </div>
+
+                {% if products.items %}
+                <div class="products-grid">
+                    {% for product in products.items %}
+                    <div class="product-card">
+                        {% if product.discount_price %}
+                            <div class="discount-badge">Sale</div>
+                        {% endif %}
+                        <div class="product-img">
+                            {% if product.image_url %}
+                                <img src="{{ url_for('static', filename='images/' + product.image_url) }}" alt="{{ product.name }}">
+                            {% else %}
+                                <img src="https://via.placeholder.com/300x300?text={{ product.name }}" alt="{{ product.name }}">
+                            {% endif %}
+                        </div>
+                        <div class="product-info">
+                            <span class="product-category">{{ product.category.name }}</span>
+                            <h3><a href="{{ url_for('products.detail', slug=product.slug) }}">{{ product.name }}</a></h3>
+                            <div class="product-price">
+                                {% if product.discount_price %}
+                                    <span class="original-price">${{ "%.2f"|format(product.price) }}</span>
+                                    <span class="sale-price">${{ "%.2f"|format(product.discount_price) }}</span>
+                                {% else %}
+                                    <span class="price">${{ "%.2f"|format(product.price) }}</span>
+                                {% endif %}
+                            </div>
+                            <form action="{{ url_for('cart.add_to_cart', product_id=product.id) }}" method="post">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input">
+                                <button type="submit" class="btn btn-primary btn-sm" {% if not product.is_in_stock() %}disabled{% endif %}>
+                                    <i class="fas fa-cart-plus"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if products.has_prev or products.has_next %}
+                <div class="pagination">
+                    {% if products.has_prev %}
+                        <a href="{{ url_for('products.catalog', page=products.prev_num, category=category_slug, q=search_query, sort=sort) }}" class="page-link">&laquo; Previous</a>
+                    {% endif %}
+
+                    {% for page_num in products.iter_pages(left_edge=2, left_current=2, right_current=3, right_edge=2) %}
+                        {% if page_num %}
+                            {% if page_num == products.page %}
+                                <span class="page-link current">{{ page_num }}</span>
+                            {% else %}
+                                <a href="{{ url_for('products.catalog', page=page_num, category=category_slug, q=search_query, sort=sort) }}" class="page-link">{{ page_num }}</a>
+                            {% endif %}
+                        {% else %}
+                            <span class="ellipsis">...</span>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if products.has_next %}
+                        <a href="{{ url_for('products.catalog', page=products.next_num, category=category_slug, q=search_query, sort=sort) }}" class="page-link">Next &raquo;</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                {% else %}
+                <div class="empty-state">
+                    <i class="fas fa-search"></i>
+                    <h3>No products found</h3>
+                    <p>Try adjusting your search or filters</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
