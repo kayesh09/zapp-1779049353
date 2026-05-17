@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.name }} - FreshMart{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="product-detail">
+        <div class="product-images">
+            {% if product.image_url %}
+                <img src="{{ url_for('static', filename='images/' + product.image_url) }}" alt="{{ product.name }}" class="main-image">
+            {% else %}
+                <img src="https://via.placeholder.com/600x600?text={{ product.name }}" alt="{{ product.name }}" class="main-image">
+            {% endif %}
+        </div>
+
+        <div class="product-info-detail">
+            <div class="breadcrumb">
+                <a href="{{ url_for('pages.index') }}">Home</a> /
+                <a href="{{ url_for('products.catalog', category=product.category.slug) }}">{{ product.category.name }}</a> /
+                <span>{{ product.name }}</span>
+            </div>
+
+            <h1>{{ product.name }}</h1>
+
+            <div class="product-price-detail">
+                {% if product.discount_price %}
+                    <span class="original-price">${{ "%.2f"|format(product.price) }}</span>
+                    <span class="sale-price">${{ "%.2f"|format(product.discount_price) }}</span>
+                {% else %}
+                    <span class="price">${{ "%.2f"|format(product.price) }}</span>
+                {% endif %}
+                <span class="unit">per {{ product.unit }}</span>
+            </div>
+
+            <div class="product-meta">
+                <p><strong>SKU:</strong> {{ product.sku or 'N/A' }}</p>
+                <p><strong>Availability:</strong>
+                    {% if product.is_in_stock() %}
+                        <span class="in-stock">In Stock ({{ product.stock }} available)</span>
+                    {% else %}
+                        <span class="out-stock">Out of Stock</span>
+                    {% endif %}
+                </p>
+                <p><strong>Category:</strong> {{ product.category.name }}</p>
+            </div>
+
+            <div class="product-description">
+                <h3>Description</h3>
+                <p>{{ product.description or 'No description available.' }}</p>
+            </div>
+
+            {% if product.is_in_stock() %}
+            <form action="{{ url_for('cart.add_to_cart', product_id=product.id) }}" method="post" class="add-to-cart-detail">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="quantity-selector">
+                    <button type="button" class="qty-btn" onclick="this.parentElement.querySelector('input').stepDown()">-</button>
+                    <input type="number" name="quantity" value="1" min="1" max="{{ product.stock }}" class="qty-input">
+                    <button type="button" class="qty-btn" onclick="this.parentElement.querySelector('input').stepUp()">+</button>
+                </div>
+                <button type="submit" class="btn btn-primary btn-lg">
+                    <i class="fas fa-cart-plus"></i> Add to Cart
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if related_products %}
+    <section class="related-products">
+        <h2>Related Products</h2>
+        <div class="products-grid">
+            {% for product in related_products %}
+            <div class="product-card">
+                <div class="product-img">
+                    {% if product.image_url %}
+                        <img src="{{ url_for('static', filename='images/' + product.image_url) }}" alt="{{ product.name }}">
+                    {% else %}
+                        <img src="https://via.placeholder.com/300x300?text={{ product.name }}" alt="{{ product.name }}">
+                    {% endif %}
+                </div>
+                <div class="product-info">
+                    <h3><a href="{{ url_for('products.detail', slug=product.slug) }}">{{ product.name }}</a></h3>
+                    <div class="product-price">
+                        {% if product.discount_price %}
+                            <span class="sale-price">${{ "%.2f"|format(product.discount_price) }}</span>
+                        {% else %}
+                            <span class="price">${{ "%.2f"|format(product.price) }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% endif %}
+</div>
+{% endblock %}
