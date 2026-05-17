@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}{% if product %}{{ product.name }} - GroceryHub{% else %}Product - GroceryHub{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('products.products_list') }}">Products</a></li>
+            <li class="breadcrumb-item active">Product Details</li>
+        </ol>
+    </nav>
+
+    {% if product %}
+    <div class="row">
+        <!-- Left: Image -->
+        <div class="col-md-5">
+            <div class="card shadow-sm">
+                {% if product.images and product.images|length > 0 %}
+                    <img src="{{ product.images[0].image_url }}"
+                         class="card-img-top"
+                         alt="{{ product.name }}"
+                         style="height: 380px; object-fit: cover;">
+                {% else %}
+                    <div class="bg-light d-flex align-items-center justify-content-center" style="height: 380px;">
+                        <i class="fas fa-image text-muted" style="font-size: 90px;"></i>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right: Details -->
+        <div class="col-md-7">
+            <h1>{{ product.name }}</h1>
+
+            <h2 class="text-success mt-3">
+                ₹{{ "%.2f"|format(product.current_price) }}
+            </h2>
+
+            {% if product.discount_price %}
+            <p>
+                <span class="text-muted text-decoration-line-through">
+                    ₹{{ "%.2f"|format(product.price) }}
+                </span>
+            </p>
+            {% endif %}
+
+            <p>
+                <strong>Stock:</strong>
+                {% if product.is_in_stock %}
+                    <span class="badge bg-success">{{ product.stock }} available</span>
+                {% else %}
+                    <span class="badge bg-danger">Out of Stock</span>
+                {% endif %}
+            </p>
+
+            <hr>
+
+            <h5>Description</h5>
+            <p>{{ product.description or 'No description provided.' }}</p>
+
+            <a href="{{ url_for('products.products_list') }}" class="btn btn-secondary mt-4">
+                ← Back to Shop
+            </a>
+        </div>
+    </div>
+    {% else %}
+    <div class="alert alert-danger">
+        <h4>Product not found</h4>
+        <p>The product you are looking for does not exist.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
