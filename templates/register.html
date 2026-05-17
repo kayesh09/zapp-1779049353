@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Register - FreshMart{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <h2>Create Account</h2>
+        <p>Join FreshMart today</p>
+
+        <form method="post" class="auth-form">
+            <!-- CSRF TOKEN - HIDDEN -->
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" placeholder="John">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" placeholder="Doe">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Username *</label>
+                <input type="text" name="username" required placeholder="johndoe">
+            </div>
+
+            <div class="form-group">
+                <label>Email Address *</label>
+                <input type="email" name="email" required placeholder="john@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Password *</label>
+                <input type="password" name="password" required placeholder="••••••••">
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password *</label>
+                <input type="password" name="confirm_password" required placeholder="••••••••">
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 10px;">Create Account</button>
+        </form>
+
+        <p class="auth-footer" style="margin-top: 20px; text-align: center;">
+            Already have an account? <a href="{{ url_for('auth.login') }}">Login</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
