@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout - FreshMart{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Checkout</h1>
+
+    <div class="checkout-layout">
+        <div class="checkout-form">
+            <form method="post" class="form-checkout">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                <div class="form-section">
+                    <h3>Contact Information</h3>
+                    <div class="form-group">
+                        <label>Phone Number *</label>
+                        <input type="tel" name="phone" value="{{ current_user.phone or '' }}" required>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Shipping Address</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>First Name</label>
+                            <input type="text" value="{{ current_user.first_name or '' }}" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label>Last Name</label>
+                            <input type="text" value="{{ current_user.last_name or '' }}" disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Address *</label>
+                        <textarea name="address" rows="3" required>{{ current_user.address or '' }}</textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>City *</label>
+                            <input type="text" name="city" value="{{ current_user.city or '' }}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Postal Code *</label>
+                            <input type="text" name="postal" value="{{ current_user.postal_code or '' }}" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3>Additional Information</h3>
+                    <div class="form-group">
+                        <label>Order Notes (optional)</label>
+                        <textarea name="notes" rows="3" placeholder="Special instructions for delivery..."></textarea>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg btn-block">
+                    Place Order
+                </button>
+            </form>
+        </div>
+
+        <div class="checkout-summary">
+            <h3>Order Summary</h3>
+            <div class="checkout-items">
+                {% for item in cart_items %}
+                <div class="checkout-item">
+                    <div class="item-img">
+                        {% if item.product.image_url %}
+                            <img src="{{ url_for('static', filename='images/' + item.product.image_url) }}" alt="{{ item.product.name }}">
+                        {% endif %}
+                        <span class="item-qty">{{ item.quantity }}x</span>
+                    </div>
+                    <div class="item-info">
+                        <p class="item-name">{{ item.product.name }}</p>
+                        <p class="item-variant">{{ item.product.unit }}</p>
+                    </div>
+                    <div class="item-price">${{ "%.2f"|format(item.get_total()) }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="checkout-totals">
+                {% set ns = namespace(total=0) %}
+                {% for item in cart_items %}
+                    {% set ns.total = ns.total + item.get_total() %}
+                {% endfor %}
+                <div class="total-row">
+                    <span>Subtotal</span>
+                    <span>${{ "%.2f"|format(ns.total) }}</span>
+                </div>
+                <div class="total-row">
+                    <span>Shipping</span>
+                    <span>Free</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Total</span>
+                    <span>${{ "%.2f"|format(ns.total) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
