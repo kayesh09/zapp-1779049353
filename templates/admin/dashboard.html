@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <aside class="admin-sidebar">
+        <h3>Admin Panel</h3>
+        <nav>
+            <a href="{{ url_for('admin.dashboard') }}" class="active"><i class="fas fa-dashboard"></i> Dashboard</a>
+            <a href="{{ url_for('admin.products') }}"><i class="fas fa-box"></i> Products</a>
+            <a href="{{ url_for('admin.categories') }}"><i class="fas fa-tags"></i> Categories</a>
+            <a href="{{ url_for('admin.orders') }}"><i class="fas fa-shopping-bag"></i> Orders</a>
+            <a href="{{ url_for('admin.users') }}"><i class="fas fa-users"></i> Users</a>
+        </nav>
+    </aside>
+
+    <div class="admin-content">
+        <h1 style="margin-bottom: 2rem;">Dashboard</h1>
+
+        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 1rem;">
+                <i class="fas fa-users" style="font-size: 2rem; color: var(--primary);"></i>
+                <div>
+                    <h4 style="font-size: 1.75rem; margin: 0;">{{ total_users }}</h4>
+                    <p style="color: #6b7280; margin: 0;">Total Users</p>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 1rem;">
+                <i class="fas fa-box" style="font-size: 2rem; color: var(--primary);"></i>
+                <div>
+                    <h4 style="font-size: 1.75rem; margin: 0;">{{ total_products }}</h4>
+                    <p style="color: #6b7280; margin: 0;">Products</p>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 1rem;">
+                <i class="fas fa-shopping-bag" style="font-size: 2rem; color: var(--primary);"></i>
+                <div>
+                    <h4 style="font-size: 1.75rem; margin: 0;">{{ total_orders }}</h4>
+                    <p style="color: #6b7280; margin: 0;">Orders</p>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: var(--shadow); display: flex; align-items: center; gap: 1rem; border-left: 4px solid #f59e0b;">
+                <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b;"></i>
+                <div>
+                    <h4 style="font-size: 1.75rem; margin: 0;">{{ low_stock|length }}</h4>
+                    <p style="color: #6b7280; margin: 0;">Low Stock</p>
+                </div>
+            </div>
+        </div>
+
+        <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: var(--shadow); margin-bottom: 2rem;">
+            <h3 style="margin-bottom: 1rem;">Recent Orders</h3>
+            {% if recent_orders %}
+            <table class="admin-table" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th>Order #</th>
+                        <th>Customer</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in recent_orders %}
+                    <tr>
+                        <td>{{ order.order_number }}</td>
+                        <td>{{ order.customer.username }}</td>
+                        <td>${{ "%.2f"|format(order.total_amount) }}</td>
+                        <td>
+                            <span class="badge badge-{{ order.status }}" style="padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.875rem;
+                                {% if order.status == 'pending' %}background: #fef3c7; color: #92400e;
+                                {% elif order.status == 'delivered' %}background: #dcfce7; color: #166534;
+                                {% elif order.status == 'cancelled' %}background: #fee2e2; color: #991b1b;
+                                {% else %}background: #dbeafe; color: #1e40af;{% endif %}">
+                                {{ order.status }}
+                            </span>
+                        </td>
+                        <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color: #6b7280;">No orders yet.</p>
+            {% endif %}
+        </div>
+
+        {% if low_stock %}
+        <div style="background: white; padding: 1.5rem; border-radius: 1rem; box-shadow: var(--shadow); border-left: 4px solid #ef4444;">
+            <h3 style="color: #ef4444; margin-bottom: 1rem;"><i class="fas fa-exclamation-circle"></i> Low Stock Alert</h3>
+            <ul style="list-style: none; padding: 0;">
+                {% for product in low_stock %}
+                <li style="padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6;">
+                    <a href="{{ url_for('admin.edit_product', product_id=product.id) }}" style="color: var(--primary);">
+                        {{ product.name }}
+                    </a>
+                    - Only {{ product.stock }} left!
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
